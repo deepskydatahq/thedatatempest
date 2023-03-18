@@ -1,0 +1,15 @@
+{
+    "type":"source",
+    "name":"Keboola",
+    "description":"we use Keboola as our major batch pipeline",
+    "data": [
+        {
+            "name":"keboola_supabase_user_created",
+            "originalSource":"supabase",
+            "loadType":"batch",
+            "frequence":"daily",
+            "source_id":"",
+            "source_link":""
+        }
+    ]
+}
