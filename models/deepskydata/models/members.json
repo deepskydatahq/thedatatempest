@@ -1,0 +1,181 @@
+{
+    "name":"Members",
+    "description": "A member is user that has an active account for Deepskydata.",
+    "owner": "core",
+
+    "activities":[
+        {
+            "name":"created",
+            "description": "When a new account gets created in Supabase.",
+            "activity_definitions": {
+                "step":1,
+                "type":"mapping",
+                "sources": [
+                    {
+                        "name":"keboola_supabase_user_created",
+                        "type":"batch",
+                        "source":"keboola",
+                        "primary":true
+                    }
+                ]
+            } 
+        },
+        {
+            "name":"started_course",
+            "description": "When a user is starting a course for the first time. The course started event is defined by the first lesson they start to watch from a course.",
+            "activity_definitions":{
+                "step":1,
+                "type": "union",
+                "description":"For the first implementation was using supabase to store the events. It was switched to use Tinybird",
+                "sources": [
+                    {
+                        "name":"keboola_tinybird_c-source_tinybird_video_stream",
+                        "type":"batch",
+                        "source":"keboola",
+                        "primary":true
+                    },
+                    {
+                        "name":"keboola_supabase_all_activities",
+                        "type":"batch",
+                        "source":"keboola"
+                    }
+                    
+                ]
+            } 
+        },
+        {
+            "name":"completed_course",
+            "description": "When a user is completing a course. This is defined when a user has completed the video for the course with is marked as finished course in Hygraph.",
+            "activity_definitions":[
+                {
+                    "step": 1,
+                    "type": "union",
+                    "description":"For the first implementation was using supabase to store the events. It was switched to use Tinybird",
+                    "sources": [
+                        {
+                            "name":"keboola_tinybird_c-source_tinybird_video_stream",
+                            "type":"batch",
+                            "source":"keboola",
+                            "primary":true
+                        },
+                        {
+                            "name":"keboola_supabase_all_activities",
+                            "type":"batch",
+                            "source":"keboola"
+                        }
+                        
+                    ]
+                },
+                {
+                    "step":2,
+                    "type":"join",
+                    "description":"We define the finished Course lesson in Hygraph by using a boolean field. It's a manual process at the moment and therefore when not added, a course can't be tracked as finished.",
+                    "sources":[
+                        {
+                            "name":"keboola_c-source_hygraph_courses",
+                            "type":"batch",
+                            "source":"keboola",
+                            "primary":true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name":"started_lesson",
+            "description": "When a user is starting a lesson for the first time.",
+            "activity_definitions":[
+                {
+                    "step": 1,
+                    "type": "union",
+                    "description":"For the first implementation we used supabase to store the events. It was switched to use Tinybird",
+                    "sources": [
+                        {
+                            "name":"keboola_tinybird_c-source_tinybird_video_stream",
+                            "type":"batch",
+                            "source":"keboola",
+                            "primary":true
+                        },
+                        {
+                            "name":"keboola_supabase_all_activities",
+                            "type":"batch",
+                            "source":"keboola"
+                        }
+                        
+                    ]
+                }
+            ]
+        },
+        {
+            "name":"completed_lesson",
+            "description": "When a user has completed a lesson for the first time.",
+            "activity_definitions":[
+                {
+                    "step": 1,
+                    "type": "union",
+                    "description":"For the first implementation we used supabase to store the events. It was switched to use Tinybird",
+                    "sources": [
+                        {
+                            "name":"keboola_tinybird_c-source_tinybird_video_stream",
+                            "type":"batch",
+                            "source":"keboola",
+                            "primary":true
+                        },
+                        {
+                            "name":"keboola_supabase_all_activities",
+                            "type":"batch",
+                            "source":"keboola"
+                        }
+                        
+                    ]
+                }
+            ]
+        }
+
+        
+    ],
+    "properties":[
+        {
+            "name":"member_id",
+            "description":"the unique id that is generated in Supabase to identify the user.",
+            "type":"string",
+            "required":true,
+            "tests": [
+                {
+                    "type":"simple",
+                    "test":"unique"
+                }
+            ]
+        },
+        {
+            "name":"member_attribution",
+            "description":"The answer a user gives during signup, where they heard about deepskydata",
+            "type":"string",
+            "required":false
+        },
+        {
+            "name":"member_job_title",
+            "description":"The answer a user gives during signup, what job title they have currently",
+            "type":"string",
+            "required":false
+        },
+        {
+            "name":"member_experience",
+            "description":"The answer a user gives during signup, what data experience they have",
+            "type":"string",
+            "required":false
+        },
+        {
+            "name":"member_created_at",
+            "description":"The date when an account has been created",
+            "type":"string",
+            "required":false
+        },
+        {
+            "name":"member_email_domain",
+            "description":"We extract the email domain from the signup email and use it to detect dark slack sharing (people from the same domain have signed up).",
+            "type":"string",
+            "required":false
+        },
+    ]
+}
